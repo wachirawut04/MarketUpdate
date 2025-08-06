@@ -1,7 +1,10 @@
+import Nav from "../Components/Nav"; 
+
 export default function Market() {
     return (
         <div>
-            <h1>Welcome to the Home Table</h1>
+            <Nav/>
+            <h1>Market</h1>
         </div>
     );
 }
