@@ -16,12 +16,14 @@ export default function Market() {
   const symbolFromURL = searchParams.get("symbol");
 
   const [selectedClass, setSelectedClass] = useState(
-    assetClasses.find(
-      (a) => a.value === categoryFromURL?.toLowerCase()
-    ) || assetClasses[0]
+    assetClasses.find((a) => a.value === categoryFromURL?.toLowerCase()) ||
+      assetClasses[0]
   );
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     async function fetchAssets() {
@@ -31,20 +33,17 @@ export default function Market() {
         const json = await res.json();
 
         const filtered = json.filter(
-          (item) =>
-            item.asset_class.toLowerCase() === selectedClass.value
+          (item) => item.asset_class.toLowerCase() === selectedClass.value
         );
 
-        if (symbolFromURL) {
-          setData(
-            filtered.filter(
-              (item) =>
-                item.symbol.toLowerCase() === symbolFromURL.toLowerCase()
+        const finalData = symbolFromURL
+          ? filtered.filter(
+              (item) => item.symbol.toLowerCase() === symbolFromURL.toLowerCase()
             )
-          );
-        } else {
-          setData(filtered);
-        }
+          : filtered;
+
+        setData(finalData);
+        setCurrentPage(1);
       } catch (error) {
         console.error("Failed to fetch data:", error);
         setData([]);
@@ -54,6 +53,12 @@ export default function Market() {
     }
     fetchAssets();
   }, [selectedClass, symbolFromURL]);
+
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const paginatedData = data.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] p-4 sm:p-6">
@@ -110,11 +115,13 @@ export default function Market() {
               </Listbox.Options>
             </Transition>
           </div>
+        </Listbox>
 
-          {/* Table */}
-          {loading ? (
-            <div className="text-center py-6">Loading...</div>
-          ) : (
+        {/* Table */}
+        {loading ? (
+          <div className="text-center py-6">Loading...</div>
+        ) : (
+          <>
             <div className="overflow-x-auto shadow-md rounded-md">
               <table className="min-w-full border-collapse">
                 <thead className="bg-[#0077C0] text-white">
@@ -129,14 +136,14 @@ export default function Market() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.length === 0 ? (
+                  {paginatedData.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="text-center py-4">
                         No data available
                       </td>
                     </tr>
                   ) : (
-                    data.map((item) => {
+                    paginatedData.map((item) => {
                       const isPositive = item.change >= 0;
                       return (
                         <tr key={item.symbol || item.id} className="even:bg-gray-100">
@@ -154,8 +161,37 @@ export default function Market() {
                 </tbody>
               </table>
             </div>
-          )}
-        </Listbox>
+
+            {/* Pagination Controls - Single number with arrows */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center space-x-4 mt-4">
+                <button
+                  className={`px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 ${
+                    currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  &larr;
+                </button>
+
+                <span className="px-4 py-1 font-semibold">
+                  {currentPage} / {totalPages}
+                </span>
+
+                <button
+                  className={`px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 ${
+                    currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  &rarr;
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

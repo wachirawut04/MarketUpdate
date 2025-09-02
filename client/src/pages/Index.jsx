@@ -2,3 +2,8 @@ export {default as Home} from './Home';
 export {default as Market} from './Market';
 export {default as Download} from './Download';
 export {default as Graph} from './Graph';
+export {default as SignIn} from './SignIn';
+export {default as SignUp} from './SignUp';
+export {default as User} from './User';
+export {default as CustomTable} from './CustomTable';
+export {default as CustomReport} from './CustomReport';
