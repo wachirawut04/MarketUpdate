@@ -15,6 +15,10 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "nodemon": "^3.1.10"
+    "http-proxy-middleware": "^3.0.5",
+    "json2csv": "^6.0.0-alpha.2",
+    "nodemon": "^3.1.10",
+    "sqlite3": "^5.1.7",
+    "yahoo-finance2": "^2.13.3"
   }
 }

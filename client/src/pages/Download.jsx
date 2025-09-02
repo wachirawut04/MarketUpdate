@@ -1,9 +1,10 @@
 import Nav from "../Components/Nav";
+import DownloadData from "../Components/DownloadData";
 
 export default function Download() {
   return (
-    <div className="bg-slate-900">
-      <Nav />
+    <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
+      <DownloadData />
     </div>
   );
 }
